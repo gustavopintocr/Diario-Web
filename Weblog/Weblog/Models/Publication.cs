@@ -8,9 +8,10 @@
         public string? Header { get; set; }
         public byte[]? Image { get; set; }
         public string? Body { get; set; }
-        public int NumComments { get; set; }
-        public int IdAuthor { get; set; }
+        //public int NumComments { get; set; }
+        public int AuthorId { get; set; }
         public Author Author { get; set; } = null!;
+        public ICollection<Comment> Comments { get; } = new List<Comment>();
 
     }
 }

@@ -6,7 +6,7 @@
         public string? Body { get; set; }
         public string? Email { get; set; }
         public DateTime CreatedDate { get; set; }
-        public int IdPublication { get; set; }
+        public int PublicationId { get; set; }
         public Publication Publication { get; set; } = null!;
     }
 }

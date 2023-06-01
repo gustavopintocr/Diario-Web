@@ -12,7 +12,7 @@ using Weblog.Data;
 namespace Weblog.Migrations
 {
     [DbContext(typeof(WeblogContext))]
-    [Migration("20230528051157_initdata")]
+    [Migration("20230529042146_initdata")]
     partial class initdata
     {
         /// <inheritdoc />
@@ -24,42 +24,6 @@ namespace Weblog.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Weblog.Models.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Admin");
-                });
-
-            modelBuilder.Entity("Weblog.Models.Author", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Author");
-                });
 
             modelBuilder.Entity("Weblog.Models.Comment", b =>
                 {
@@ -77,9 +41,6 @@ namespace Weblog.Migrations
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IdPublication")
-                        .HasColumnType("int");
 
                     b.Property<int>("PublicationId")
                         .HasColumnType("int");
@@ -111,14 +72,8 @@ namespace Weblog.Migrations
                     b.Property<string>("Header")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IdAuthor")
-                        .HasColumnType("int");
-
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<int>("NumComments")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -144,34 +99,34 @@ namespace Weblog.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Weblog.Models.Admin", b =>
                 {
-                    b.HasOne("Weblog.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("Weblog.Models.User");
 
-                    b.Navigation("User");
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.ToTable("Admin");
                 });
 
             modelBuilder.Entity("Weblog.Models.Author", b =>
                 {
-                    b.HasOne("Weblog.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("Weblog.Models.User");
 
-                    b.Navigation("User");
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.ToTable("Author");
                 });
 
             modelBuilder.Entity("Weblog.Models.Comment", b =>
                 {
                     b.HasOne("Weblog.Models.Publication", "Publication")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -188,6 +143,29 @@ namespace Weblog.Migrations
                         .IsRequired();
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Weblog.Models.Admin", b =>
+                {
+                    b.HasOne("Weblog.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("Weblog.Models.Admin", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Weblog.Models.Author", b =>
+                {
+                    b.HasOne("Weblog.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("Weblog.Models.Author", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Weblog.Models.Publication", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Weblog.Models.Author", b =>

@@ -1,9 +1,9 @@
-﻿namespace Weblog.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Weblog.Models
 {
-    public class Admin
+    [Table("Admin")]
+    public class Admin : User
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
     }
 }

@@ -22,8 +22,9 @@ namespace Weblog.Controllers
         // GET: Admins
         public async Task<IActionResult> Index()
         {
-            var weblogContext = _context.Admin.Include(a => a.User);
-            return View(await weblogContext.ToListAsync());
+              return _context.Admin != null ? 
+                          View(await _context.Admin.ToListAsync()) :
+                          Problem("Entity set 'WeblogContext.Admin'  is null.");
         }
 
         // GET: Admins/Details/5
@@ -35,7 +36,6 @@ namespace Weblog.Controllers
             }
 
             var admin = await _context.Admin
-                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (admin == null)
             {
@@ -48,7 +48,6 @@ namespace Weblog.Controllers
         // GET: Admins/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id");
             return View();
         }
 
@@ -57,7 +56,7 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId")] Admin admin)
+        public async Task<IActionResult> Create([Bind("AdminId,Id,Name")] Admin admin)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +64,6 @@ namespace Weblog.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id", admin.UserId);
             return View(admin);
         }
 
@@ -82,7 +80,6 @@ namespace Weblog.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id", admin.UserId);
             return View(admin);
         }
 
@@ -91,7 +88,7 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId")] Admin admin)
+        public async Task<IActionResult> Edit(int id, [Bind("AdminId,Id,Name")] Admin admin)
         {
             if (id != admin.Id)
             {
@@ -118,7 +115,6 @@ namespace Weblog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id", admin.UserId);
             return View(admin);
         }
 
@@ -131,7 +127,6 @@ namespace Weblog.Controllers
             }
 
             var admin = await _context.Admin
-                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (admin == null)
             {

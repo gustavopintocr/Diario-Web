@@ -28,16 +28,15 @@ namespace Weblog.Migrations
                 name: "Admin",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    AdminId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Admin", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Admin_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Admin_User_Id",
+                        column: x => x.Id,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -47,16 +46,15 @@ namespace Weblog.Migrations
                 name: "Author",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    AuthorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Author", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Author_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Author_User_Id",
+                        column: x => x.Id,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -73,8 +71,6 @@ namespace Weblog.Migrations
                     Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumComments = table.Column<int>(type: "int", nullable: false),
-                    IdAuthor = table.Column<int>(type: "int", nullable: false),
                     AuthorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -97,7 +93,6 @@ namespace Weblog.Migrations
                     Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IdPublication = table.Column<int>(type: "int", nullable: false),
                     PublicationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -110,16 +105,6 @@ namespace Weblog.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Admin_UserId",
-                table: "Admin",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Author_UserId",
-                table: "Author",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comment_PublicationId",
