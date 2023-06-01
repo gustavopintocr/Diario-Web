@@ -56,7 +56,7 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Date,Header,Image,Body,NumComments,IdAuthor")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Title,Date,Header,Image,Body,UserId")] Publication publication)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +88,7 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Date,Header,Image,Body,NumComments,IdAuthor")] Publication publication)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Date,Header,Image,Body,UserId")] Publication publication)
         {
             if (id != publication.Id)
             {

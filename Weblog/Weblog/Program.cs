@@ -1,9 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Weblog.Data;
+using Weblog.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<WeblogContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("WeblogContext") ?? throw new InvalidOperationException("Connection string 'WeblogContext' not found.")));
+
+builder.Services.AddIdentity<User, IdentityRole>().AddDefaultTokenProviders()
+    .AddEntityFrameworkStores<WeblogContext>()
+    .AddDefaultUI();
+
+builder.Services.AddRazorPages();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,8 +31,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();;
 
 app.UseAuthorization();
+
+app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",
