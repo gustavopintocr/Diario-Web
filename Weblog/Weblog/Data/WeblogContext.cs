@@ -32,7 +32,6 @@ namespace Weblog.Data
         }
 
         public DbSet<Weblog.Models.Publication> Publication { get; set; } = default!;
-
         public DbSet<Weblog.Models.Comment>? Comment { get; set; }
     }
 }
