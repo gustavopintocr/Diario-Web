@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -56,8 +57,10 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Date,Header,Image,Body,UserId")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication)
         {
+            publication.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            publication.Date = DateTime.Now;
             if (ModelState.IsValid)
             {
                 _context.Add(publication);
@@ -88,7 +91,7 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Date,Header,Image,Body,UserId")] Publication publication)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image,Body")] Publication publication)
         {
             if (id != publication.Id)
             {
