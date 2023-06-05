@@ -12,6 +12,7 @@
         public string? UserId { get; set; } = string.Empty;
         public User? User { get; set; } = null!;
         public ICollection<Comment> Comments { get; } = new List<Comment>();
+        public ICollection<Category> Categories { get; } = new List<Category>();
 
     }
 }

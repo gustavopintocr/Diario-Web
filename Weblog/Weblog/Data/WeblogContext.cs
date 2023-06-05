@@ -28,11 +28,15 @@ namespace Weblog.Data
 
             modelBuilder.Entity<Comment>().ToTable("Comment");
 
+            modelBuilder.Entity<Category>().ToTable("Category");
+
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Weblog.Models.Publication> Publication { get; set; } = default!;
 
         public DbSet<Weblog.Models.Comment>? Comment { get; set; }
+
+        public DbSet<Weblog.Models.Category>? Category { get; set; }
     }
 }
