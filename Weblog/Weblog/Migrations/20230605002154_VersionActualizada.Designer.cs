@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Weblog.Data;
 
@@ -11,9 +12,11 @@ using Weblog.Data;
 namespace Weblog.Migrations
 {
     [DbContext(typeof(WeblogContext))]
-    partial class WeblogContextModelSnapshot : ModelSnapshot
+    [Migration("20230605002154_VersionActualizada")]
+    partial class VersionActualizada
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace Weblog.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CategoryPublication", b =>
-                {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PublicationsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoriesId", "PublicationsId");
-
-                    b.HasIndex("PublicationsId");
-
-                    b.ToTable("CategoryPublication");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -67,14 +55,14 @@ namespace Weblog.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "2ce60238-3a6a-4785-af9d-f88e8b455c88",
+                            ConcurrencyStamp = "3f7a6f2d-b597-45f9-aa39-93823ce25f98",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "d653c9a8-36b7-4250-bdca-39d12a254e34",
+                            ConcurrencyStamp = "25f654c4-5d98-4bd9-a0f2-47ce8d74a289",
                             Name = "Author",
                             NormalizedName = "AUTHOR"
                         });
@@ -186,25 +174,6 @@ namespace Weblog.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Weblog.Models.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category", (string)null);
-                });
-
             modelBuilder.Entity("Weblog.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -245,6 +214,9 @@ namespace Weblog.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
@@ -325,21 +297,6 @@ namespace Weblog.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("CategoryPublication", b =>
-                {
-                    b.HasOne("Weblog.Models.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Weblog.Models.Publication", null)
-                        .WithMany()
-                        .HasForeignKey("PublicationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

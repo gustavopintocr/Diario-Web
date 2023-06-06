@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using PagedList
+@using PagedList.Mvc
+@using X.PagedList.Mvc
+
+@model IPagedList<Publication> 
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <title>Diario Web</title>
@@ -10,54 +20,41 @@
 <body>
     <div class="container mt-4">
         <div class="row">
-            @*@foreach (var item in Model) {*@
-            <div class="col-lg-9 left-section">
-                <div class="post">
-                    <h2 class="post-title">Título de la publicación</h2>
-                    <p class="text-muted">Fecha de publicación</p>
-                    <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
-                    <p class="post-summary">Resumen de la publicación</p>
-                    <p class="text-muted">
-                        Autor: <a class="author-link" href="#">Nombre del autor</a>
-                        | <a href="#">Ver comentarios (X)</a>
-                    </p>
-                    <a href="#" class="btn btn-primary">Leer más</a>
-                </div>
-                <!-- Otras publicaciones -->
-
-                <nav aria-label="Paginación">
-                    <ul class="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                        </li>
-                        <li class="page-item active" aria-current="page">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            @if(Model is not null){
+                @foreach (var item in Model)
+                {
+                    <div class="col-lg-9 left-section">
+                        <div class="post">
+                            <h2 class="post-title">@item.Title</h2>
+                            <p class="text-muted">@item.Date</p>
+                            <img src="@item.Image" alt="Imagen de la publicación" class="img-fluid mb-2">
+                            <p class="post-summary">@item.Header</p>
+                            <p class="text-muted">
+                                Autor: <a class="author-link" href="#">@item.UserId</a>
+                            </p>
+                            <a href="#" class="btn btn-primary">Leer más</a>
+                        </div>
+                    </div>
+                }
+            }
             <div class="col-lg-3 right-section">
                 <h4>Autores</h4>
                 <ul class="list-group">
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 1</a></li>
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 2</a></li>
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 3</a></li>
+                    @if (ViewBag.Autores is not null)
+                    {
+                        @foreach (var autor in ViewBag.Autores)
+                        {
+                            <li class="list-group-item"><a class="author-link" href="#">@autor</a></li>
+                        }
+                    }
                 </ul>
 
                 <h4 class="mt-4">Categorías</h4>
                 <ul class="list-group">
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 1</a></li>
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 2</a></li>
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 3</a></li>
+                    @*@foreach (var categoria in ViewBag.Categorias)
+                    {
+                        <li class="list-group-item"><a class="category-link" href="#">@categoria</a></li>
+                    }*@
                 </ul>
             </div>
         </div>
