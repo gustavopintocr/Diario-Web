@@ -24,7 +24,7 @@ namespace Weblog.Controllers
         public async Task<IActionResult> Index()
         {
               return _context.Publication != null ? 
-                          View(await _context.Publication.ToListAsync()) :
+                          View(await _context.Publication.Include(c => c.User).ToListAsync()) :
                           Problem("Entity set 'WeblogContext.Publication'  is null.");
         }
 
