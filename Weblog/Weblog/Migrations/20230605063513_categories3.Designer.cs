@@ -12,8 +12,8 @@ using Weblog.Data;
 namespace Weblog.Migrations
 {
     [DbContext(typeof(WeblogContext))]
-    [Migration("20230605043731_Category")]
-    partial class Category
+    [Migration("20230605063513_categories3")]
+    partial class categories3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,12 +30,12 @@ namespace Weblog.Migrations
                     b.Property<int>("CategoriesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersId")
+                    b.Property<int>("PublicationsId")
                         .HasColumnType("int");
 
-                    b.HasKey("CategoriesId", "UsersId");
+                    b.HasKey("CategoriesId", "PublicationsId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("PublicationsId");
 
                     b.ToTable("CategoryPublication");
                 });
@@ -70,14 +70,14 @@ namespace Weblog.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "b1ed90a3-8101-43c3-b906-d42a83c31103",
+                            ConcurrencyStamp = "62a1c163-db94-49fd-9650-f7fa21132161",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "1a51a10a-afeb-49b3-bede-30702b2b8042",
+                            ConcurrencyStamp = "e6a8da7e-dd0c-4338-9c3d-61d39135b745",
                             Name = "Author",
                             NormalizedName = "AUTHOR"
                         });
@@ -205,7 +205,7 @@ namespace Weblog.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Weblog.Models.Comment", b =>
@@ -248,9 +248,6 @@ namespace Weblog.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Header")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
@@ -343,7 +340,7 @@ namespace Weblog.Migrations
 
                     b.HasOne("Weblog.Models.Publication", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("PublicationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -13,22 +13,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                Titulo
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                Fecha de creación
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Header)
+                Imagen
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Image)
+                Cuerpo
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Body)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                Autor
             </th>
             <th></th>
         </tr>
@@ -43,16 +40,13 @@
                 @Html.DisplayFor(modelItem => item.Date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Header)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Image)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Body)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserId)
+                @Html.DisplayFor(modelItem => item.User.UserName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
