@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using PagedList;
 using Weblog.Data;
 using Weblog.Models;
 
@@ -23,9 +25,19 @@ namespace Weblog.Controllers
         // GET: Publications
         public async Task<IActionResult> Index()
         {
-              return _context.Publication != null ? 
-                          View(await _context.Publication.Include(c => c.User).ToListAsync()) :
-                          Problem("Entity set 'WeblogContext.Publication'  is null.");
+            var publication = ObtenerUltimasPublicaciones();
+            ViewBag.Publications = publication;
+
+            return View();
+        }
+
+        private List<Publication> ObtenerUltimasPublicaciones()
+        {
+            // Lógica para obtener las últimas publicaciones desde el controlador de Publicaciones
+            // Puedes utilizar Entity Framework para acceder a la base de datos y obtener los datos
+            // Ejemplo:
+            return _context.Publication.OrderByDescending(p => p.Date).Take(5).ToList();
+            
         }
 
         // GET: Publications/Details/5
@@ -162,5 +174,6 @@ namespace Weblog.Controllers
         {
           return (_context.Publication?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
     }
 }

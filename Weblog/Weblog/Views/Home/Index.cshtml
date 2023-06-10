@@ -10,21 +10,21 @@
 <body>
     <div class="container mt-4">
         <div class="row">
-            @*@foreach (var item in Model) {*@
             <div class="col-lg-9 left-section">
-                <div class="post">
-                    <h2 class="post-title">Título de la publicación</h2>
-                    <p class="text-muted">Fecha de publicación</p>
-                    <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
-                    <p class="post-summary">Resumen de la publicación</p>
-                    <p class="text-muted">
-                        Autor: <a class="author-link" href="#">Nombre del autor</a>
-                        | <a href="#">Ver comentarios (X)</a>
-                    </p>
-                    <a href="#" class="btn btn-primary">Leer más</a>
-                </div>
-                <!-- Otras publicaciones -->
-
+                @foreach (var publication in ViewBag.Publications)
+                {
+                    <div class="post">
+                        <h2 class="post-title">@publication.Title</h2>
+                        <p class="text-muted">@publication.Date</p>
+                        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
+                        <p class="post-summary">@publication.Body</p>
+                        <p class="text-muted">
+                            Autor: <a class="author-link" href="#">Nombre del autor</a>
+                            | <a href="#">Ver comentarios (X)</a>
+                        </p>
+                        <a href="#" class="btn btn-primary">Leer más</a>
+                    </div>
+                }
                 <nav aria-label="Paginación">
                     <ul class="pagination">
                         <li class="page-item disabled">
@@ -55,15 +55,18 @@
 
                 <h4 class="mt-4">Categorías</h4>
                 <ul class="list-group">
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 1</a></li>
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 2</a></li>
-                    <li class="list-group-item"><a class="category-link" href="#">Categoría 3</a></li>
+                    @if(ViewBag.Categories != null){
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <li class="list-group-item"><a class="category-link" href="#">@category.Name</a></li>
+                        }
+                    }
                 </ul>
             </div>
         </div>
     </div>
 
-@*    <div class="container mt-4">
+    @*<div class="container mt-4">
         <div class="row">
             <div class="col-lg-9">
                 <form class="comment-form">

@@ -27,6 +27,24 @@ namespace Weblog.Controllers
                           Problem("Entity set 'WeblogContext.Category'  is null.");
         }
 
+        public async Task<IActionResult> List()
+        {
+            ICollection<Category> categories;
+
+            if (_context.Category != null)
+            {
+                categories = await _context.Category.ToListAsync();
+            }
+            else
+            {
+                categories = new List<Category>();
+            }
+            RedirectToAction("Index", "Home");
+            return categories is not null ?
+                          View(categories) :
+                          Problem("Entity set 'WeblogContext.Category'  is null.");
+        }
+
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
