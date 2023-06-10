@@ -25,6 +25,7 @@
                 <textarea asp-for="Body" class="form-control"></textarea>
                 <span asp-validation-for="Body" class="text-danger"></span>
             </div>
+            <select multiple asp-items="ViewBag.Categories" name="selectedCategories" class="form-control w-50 dropdown"></select>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

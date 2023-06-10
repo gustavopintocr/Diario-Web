@@ -49,6 +49,8 @@ namespace Weblog.Controllers
         // GET: Publications/Create
         public IActionResult Create()
         {
+            var categories = _context.Category.ToList();
+            ViewBag.Categories = categories;
             return View();
         }
 
@@ -57,10 +59,11 @@ namespace Weblog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication, ICollection<Category> selectedCategories)
         {
             publication.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             publication.Date = DateTime.Now;
+            publication.Categories = selectedCategories;
             if (ModelState.IsValid)
             {
                 _context.Add(publication);

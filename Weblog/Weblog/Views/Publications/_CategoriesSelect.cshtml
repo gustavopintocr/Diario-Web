@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Weblog.Models.Category>
+
+@{
+    ViewData["Title"] = "Select";
+}
+
+@foreach (var category in Model)
+{
+    <label>
+        @Html.CheckBox("selectedCategories", new { value = category.Id })
+        @category.Name
+    </label>
+    <br />
+}

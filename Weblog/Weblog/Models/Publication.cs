@@ -9,7 +9,7 @@
         public string? Body { get; set; }
         public string? UserId { get; set; }
         public User? User { get; set; }
-        public ICollection<Comment> Comments { get; } = new List<Comment>();
-        public ICollection<Category> Categories { get; } = new List<Category>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
     }
 }
