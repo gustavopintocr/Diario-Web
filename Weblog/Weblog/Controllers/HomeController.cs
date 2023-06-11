@@ -52,8 +52,6 @@ namespace Weblog.Controllers
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             homepage.Publications = result;
             ViewBag.CurrentPage = pageNumber;
-
-            // Renderiza la vista parcial _PublicationList.cshtml y la devuelve como resultado Ajax
             return PartialView("_PublicationList", homepage.Publications);
         }
 
