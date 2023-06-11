@@ -65,8 +65,20 @@ namespace Weblog.Controllers
                 .Skip(startIndex)
                 .Take(pageSize)
                 .ToListAsync();
+            foreach (var publication in result)
+            {
+                int? commentCount = GetCommentCountForPublication(publication.Id);
+                publication.CommentCount = commentCount;
+            }
 
             return result;
+        }
+
+        public int? GetCommentCountForPublication(int publicationId)
+        {
+            int? commentCount = _context.Comment
+                .Count(c => c.PublicationId == publicationId);
+            return commentCount;
         }
 
         private async Task<int> ContarRegistrosEnBaseDeDatos()

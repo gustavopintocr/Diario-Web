@@ -1,4 +1,6 @@
-﻿namespace Weblog.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Weblog.Models
 {
     public class Publication
     {
@@ -9,6 +11,9 @@
         public string? Body { get; set; }
         public string? UserId { get; set; }
         public User? User { get; set; }
+        [NotMapped]
+        public int? CommentCount { get; set; }
+
         public ICollection<Comment> Comments { get; } = new List<Comment>();
         public ICollection<Category> Categories { get; } = new List<Category>();
     }
