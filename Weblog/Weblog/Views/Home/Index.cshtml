@@ -1,88 +1,125 @@
-﻿<!DOCTYPE html>
+﻿@model Weblog.Models.Homepage
+
+@{
+    ViewData["Title"] = "Index";
+}
+<!DOCTYPE html>
 <html>
 <head>
     <title>Diario Web</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Carga la vista parcial inicialmente
+            loadPartialView(1);
+
+            // Maneja el evento de clic en los enlaces de paginación
+            $(document).on('click', '.pagination-link', function (e) {
+                e.preventDefault();
+
+                var pageNumber = $(this).data('page');
+
+                // Carga la vista parcial de la página seleccionada
+                loadPartialView(pageNumber);
+            });
+        });
+
+        $(document).ready(function () {
+            $('.view-comments').on('click', function (e) {
+                e.preventDefault();
+
+                var publicationId = $(this).data('publication-id');
+
+                // Realiza una solicitud Ajax para obtener los comentarios de la publicación
+                $.ajax({
+                    url: '/Publication/Comments',
+                    type: 'GET',
+                    data: { publicationId: publicationId },
+                    success: function (data) {
+                        // Limpia la lista de comentarios
+                        $('#comments-list').empty();
+
+                        // Agrega cada comentario a la lista
+                        $.each(data, function (index, comment) {
+                            $('#comments-list').append('<li>' + comment.Body + '</li>');
+                        });
+
+                        // Muestra el pop-up de comentarios
+                        $('#comments-popup').show();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+            // Cierra el pop-up al hacer clic en cualquier parte fuera de él
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#comments-popup').length) {
+                    $('#comments-popup').hide();
+                }
+            });
+        });
+
+        function loadPartialView(pageNumber) {
+            var pageSize = 5; // Número de elementos por página
+
+            $.ajax({
+                url: '/Home/Pages',
+                type: 'GET',
+                data: { page: pageNumber },
+                success: function (data) {
+                    // Actualiza el contenido de las publicaciones con los nuevos resultados
+                    $('#partialViewContainer').html(data);
+
+                    // Actualiza los enlaces de paginación activando el enlace correspondiente
+                    $('#pagination').find('.pagination-link').removeClass('active');
+                    $('#pagination').find('[data-page="' + pageNumber + '"]').addClass('active');
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container mt-4">
         <div class="row">
             <div class="col-lg-9 left-section">
-                @foreach (var publication in ViewBag.Publications)
-                {
-                    <div class="post">
-                        <h2 class="post-title">@publication.Title</h2>
-                        <p class="text-muted">@publication.Date</p>
-                        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
-                        <p class="post-summary">@publication.Body</p>
-                        <p class="text-muted">
-                            Autor: <a class="author-link" href="#">Nombre del autor</a>
-                            | <a href="#">Ver comentarios (X)</a>
-                        </p>
-                        <a href="#" class="btn btn-primary">Leer más</a>
+                <div id="partialViewContainer">
+                    <div id="partialViewContainer"></div>
+                </div>
+                <div id="comments-popup" class="popup-container">
+                    <div class="popup-content">
+                        <h3>Comentarios</h3>
+                        <ul id="comments-list"></ul>
                     </div>
-                }
-                <nav aria-label="Paginación">
-                    <ul class="pagination" id="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                        </li>
-                        @for (var i = 1; i <= Math.Ceiling((double)ViewBag.TotalItems / ViewBag.PageSize); i++)
-                        {
-                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link pagination-link" href="#" data-page="@i">@i</a>
-                            </li>
-                        }
-                        <li class="page-item">
-                            <a class="page-link" href="#">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
+                </div>
             </div>
             <div class="col-lg-3 right-section">
                 <h4>Autores</h4>
                 <ul class="list-group">
-                    @if (ViewBag.Autores is not null)
+                    @foreach (var author in Model.Authors)
                     {
-                        @foreach (var autor in ViewBag.Autores)
-                        {
-                            <li class="list-group-item"><a class="author-link" href="#">@autor</a></li>
-                        }
+                        <li class="list-group-item"><a class="category-link" href="#">@author</a></li>
                     }
                 </ul>
 
                 <h4 class="mt-4">Categorías</h4>
                 <ul class="list-group">
-                    @if(ViewBag.Categories != null){
-                        @foreach (var category in ViewBag.Categories)
-                        {
-                            <li class="list-group-item"><a class="category-link" href="#">@category.Name</a></li>
-                        }
+                    @foreach (var category in Model.Categories)
+                    {
+                        <li class="list-group-item"><a class="category-link" href="#">@category.Name</a></li>
                     }
                 </ul>
             </div>
         </div>
     </div>
+    
 
-    @*<div class="container mt-4">
-        <div class="row">
-            <div class="col-lg-9">
-                <form class="comment-form">
-                    <div class="form-group">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" class="form-control" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment">Comentario</label>
-                        <textarea class="form-control" id="comment" rows="3" maxlength="200" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Agregar comentario</button>
-                </form>
-            </div>
-        </div>
-    </div>*@
 </body>
 </html>

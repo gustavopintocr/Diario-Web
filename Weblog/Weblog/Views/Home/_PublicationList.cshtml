@@ -1,0 +1,33 @@
+﻿@model List<Weblog.Models.Publication>
+
+@foreach (var publication in Model)
+{
+    <div class="post">
+        <h2 class="post-title">@publication.Title</h2>
+        <p class="text-muted">@publication.Date</p>
+        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
+        <p class="post-summary">@publication.Body</p>
+        <p class="text-muted">
+            Autor: <a class="author-link" href="#">Nombre del autor</a>
+            | <a href="#" class="view-comments" data-publication-id="@publication.Id">Ver comentarios</a>
+
+        </p>
+        <a href="#" class="btn btn-primary">Leer más</a>
+    </div>
+}
+<nav aria-label="Paginación">
+    <ul class="pagination" id="pagination">
+        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="@(ViewBag.CurrentPage == 1 ? "true" : "false")">Anterior</a>
+        </li>
+        @for (var i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                <a class="page-link pagination-link" href="#" data-page="@i">@i</a>
+            </li>
+        }
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+            <a class="page-link" href="#">Siguiente</a>
+        </li>
+    </ul>
+</nav>

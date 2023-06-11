@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +28,8 @@ namespace Weblog.Controllers
         // GET: Publications
         public async Task<IActionResult> Index()
         {
-            var publication = ObtenerUltimasPublicaciones();
-            ViewBag.Publications = publication;
-
-            return View();
+            var weblogContext = _context.Publication;
+            return View(await weblogContext.ToListAsync());
         }
 
         private List<Publication> ObtenerUltimasPublicaciones()
@@ -77,6 +76,7 @@ namespace Weblog.Controllers
             publication.Date = DateTime.Now;
             if (ModelState.IsValid)
             {
+                AssignUserRole(publication.UserId);
                 _context.Add(publication);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -84,6 +84,18 @@ namespace Weblog.Controllers
             return View(publication);
         }
 
+        public void AssignUserRole(string userId)
+        {
+            var roleId = _context.Roles.FirstOrDefault(r => r.Name == "Author").Id;
+            var userRole = new IdentityUserRole<string>
+            {
+                UserId = userId,
+                RoleId = roleId,
+            };
+
+            _context.UserRoles.Add(userRole);
+            _context.SaveChanges();
+        }
         // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -176,51 +188,5 @@ namespace Weblog.Controllers
         {
           return (_context.Publication?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-
-
-
-        // Paginación Carga bajo demanda
-        public async Task<IActionResult> Index(int? page)
-        {
-            int pageSize = 5; // Cantidad de elementos por página
-            int pageNumber = (page ?? 1);
-            IActionResult result = await ObtenerDatosPorPagina(pageNumber, pageSize);
-            int totalItems = await ObtenerNumeroTotalDeDatos();
-            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-
-            // Crear un objeto de paginación utilizando los datos obtenidos, el número de página actual y el número total de páginas
-            IPagedList<IActionResult> pagedData = new StaticPagedList<IActionResult>(new[] { result }, pageNumber, pageSize, totalPages);
-
-            return View(pagedData);
-        }
-
-        private async Task<IActionResult> ObtenerDatosPorPagina(int pageNumber, int pageSize)
-        {
-
-            int startIndex = (pageNumber - 1) * pageSize;
-            var result = await _context.Publication
-                .OrderBy(x => x.Date)  // Ordenar por fecha
-                .Skip(startIndex)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return View(result);
-        }
-
-        private async Task<int> ObtenerNumeroTotalDeDatos()
-        {
-            int totalItems = await ContarRegistrosEnBaseDeDatos();
-
-            return totalItems;
-        }
-
-        private async Task<int> ContarRegistrosEnBaseDeDatos()
-        {
-            int totalItems = await _context.Publication.CountAsync();
-            return totalItems;
-        }
-
-
-
     }
 }

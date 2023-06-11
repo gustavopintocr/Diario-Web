@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
+using System.Collections;
+using System.Data;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using Weblog.Data;
 using Weblog.Models;
 
@@ -11,6 +14,7 @@ namespace Weblog.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly WeblogContext _context;
+        private Homepage homepage = new Homepage();
 
         public HomeController(ILogger<HomeController> logger, WeblogContext context)
         {
@@ -20,29 +24,16 @@ namespace Weblog.Controllers
 
         public IActionResult Index()
         {
-            // Lo meti aca porque en el metodo no me los esta jalando
-            //get categories
-            List<Category> categories;
-            categories = _context.Category != null ? _context.Category.OrderBy(c => c.Name).ToList() : new List<Category>();
-            ViewBag.Categories = categories;
-
-            // get publications
-            List<Publication> publications;
-            publications = _context.Publication != null ? _context.Publication.OrderBy(x => x.Date).ToList(): new List<Publication>();
-            ViewBag.Publications = publications;
-
-            var totalCount = ContarRegistrosEnBaseDeDatos();
-            ViewBag.PageSize = 5;
-
-            return View();
+            homepage.Publications = _context.Publication.OrderBy(x => x.Date).ToList();
+            homepage.Categories = _context.Category.OrderBy(c => c.Name).ToList();
+            homepage.Authors = _context.Users
+                                        .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { User = u, UserRole = ur })
+                                        .Join(_context.Roles, ur => ur.UserRole.RoleId, r => r.Id, (ur, r) => new { ur.User, Role = r })
+                                        .Where(x => x.Role.Name == "Author")
+                                        .Select(x => x.User)
+                                        .ToList();
+            return View(homepage);
         }
-
-        //public void getCategories()
-        //{
-        //    List<Category> categories;
-        //    categories = _context.Category != null ? _context.Category.OrderBy(c => c.Name).ToList() : new List<Category>();
-        //    ViewBag.Categories = categories;
-        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -50,32 +41,28 @@ namespace Weblog.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // Paginación Carga bajo demanda
-        public async Task<IPagedList> Pages(int? page)
+        // Método para cargar los resultados paginados mediante Ajax
+        public async Task<IActionResult> Pages(int? page)
         {
             int pageSize = 5; // Cantidad de elementos por página
-            int pageNumber = (page ?? 1);
-            ICollection<Publication> result = await ObtenerDatosPorPagina(pageNumber, pageSize);
-            int totalItems = await ObtenerNumeroTotalDeDatos();
-            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            int pageNumber = page ?? 1;
+            var result = await ObtenerDatosPorPagina(pageNumber, pageSize);
+            int totalItems = await ContarRegistrosEnBaseDeDatos();
 
-            // Crear un objeto de paginación utilizando los datos obtenidos, el número de página actual y el número total de páginas
-            IPagedList<IActionResult> pagedData = new StaticPagedList<IActionResult>((IEnumerable<IActionResult>)(new[] { result }), pageNumber, pageSize, totalPages);
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            homepage.Publications = result;
+            ViewBag.CurrentPage = pageNumber;
 
-            return pagedData;
+            // Renderiza la vista parcial _PublicationList.cshtml y la devuelve como resultado Ajax
+            return PartialView("_PublicationList", homepage.Publications);
         }
 
-        //public async Task<IActionResult> GetPaginatedPosts(int pageNumber, int pageSize)
-        //{
-        //    var paginatedPosts = await ObtenerDatosPorPagina(pageNumber, pageSize);
-        //    return PartialView("_PaginatedPosts", paginatedPosts);
-        //}
 
-        private async Task<ICollection<Publication>> ObtenerDatosPorPagina(int pageNumber, int pageSize)
+        private async Task<List<Publication>> ObtenerDatosPorPagina(int pageNumber, int pageSize)
         {
             int startIndex = (pageNumber - 1) * pageSize;
-            var result = await _context.Publication
-                .OrderBy(x => x.Date)  // Ordenar por fecha
+            List<Publication> result = await _context.Publication
+                .OrderBy(x => x.Date)
                 .Skip(startIndex)
                 .Take(pageSize)
                 .ToListAsync();
@@ -83,20 +70,9 @@ namespace Weblog.Controllers
             return result;
         }
 
-
-        private async Task<int> ObtenerNumeroTotalDeDatos()
-        {
-            int totalItems = await ContarRegistrosEnBaseDeDatos();
-
-            return totalItems;
-        }
-
         private async Task<int> ContarRegistrosEnBaseDeDatos()
         {
-            int totalItems = await _context.Publication.CountAsync();
-            ViewBag.TotalItems = totalItems;
-            ViewBag.PageSize = 5;
-            return totalItems;
+            return await _context.Publication.CountAsync();
         }
     }
 }
