@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Weblog.Data;
 using Weblog.Models;
 using PagedList;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {
@@ -62,21 +64,24 @@ namespace Weblog.Controllers
         // GET: Publications/Create
         public IActionResult Create()
         {
+            ViewBag.Categories = _context.Category.ToList();
             return View();
         }
 
-        // POST: Publications/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication, int[] Categories)
         {
             publication.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             publication.Date = DateTime.Now;
+            foreach (var item in Categories) {
+                var category = await _context.Category
+                                           .FirstOrDefaultAsync(m => m.Id == item);
+                publication.Categories.Add(category);
+            }
             if (ModelState.IsValid)
             {
-                AssignUserRole(publication.UserId);
+                await AssignUserRole(publication.UserId);
                 _context.Add(publication);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -84,17 +89,20 @@ namespace Weblog.Controllers
             return View(publication);
         }
 
-        public void AssignUserRole(string userId)
+        public async Task<bool> AssignUserRole(string userId)
         {
-            var roleId = _context.Roles.FirstOrDefault(r => r.Name == "Author").Id;
-            var userRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = roleId,
-            };
+            var role = _context.Roles.FirstOrDefault(r => r.Name == "Author");
+            var userRole = await _context.UserRoles
+                            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == role.Id);
 
-            _context.UserRoles.Add(userRole);
-            _context.SaveChanges();
+            if (userRole == null)
+            {
+                // If the user is not in the role, add it
+                userRole = new IdentityUserRole<string> { UserId = userId, RoleId = role.Id };
+                _context.UserRoles.Add(userRole);
+                await _context.SaveChangesAsync();
+            }
+            return userRole != null;
         }
         // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -187,6 +195,32 @@ namespace Weblog.Controllers
         private bool PublicationExists(int id)
         {
           return (_context.Publication?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public async Task<IActionResult> PublicationsByAuthor(string? authorId)
+        {
+            if (authorId == null || _context.Publication == null)
+            {
+                return NotFound();
+            }
+            PublicationsAuthor publicationsAuthor = new PublicationsAuthor();
+            publicationsAuthor.Publications = _context.Publication.Where(p => p.UserId == authorId).ToList();
+            publicationsAuthor.Author = _context.Users.FirstOrDefault(m => m.Id == authorId);
+
+            return View(publicationsAuthor);
+        }
+
+        public async Task<IActionResult> PublicationsByCategory(int? categoryId)
+        {
+            if (categoryId == null || _context.Publication == null)
+            {
+                return NotFound();
+            }
+            PublicationsCategory publicationsCategory = new PublicationsCategory();
+            publicationsCategory.Category = _context.Category.FirstOrDefault(m => m.Id == categoryId);
+            publicationsCategory.Publications = _context.Publication.Where(p => p.Categories.Any(c => c.Id == categoryId)).ToList();
+
+            return View(publicationsCategory);
         }
     }
 }

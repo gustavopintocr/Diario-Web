@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing.Printing;
 using Weblog.Data;
 using Weblog.Models;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {
