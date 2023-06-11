@@ -1,0 +1,33 @@
+﻿@model Weblog.Models.DTOs.PublicationsAuthor
+
+@{
+    ViewData["Title"] = "PublicationsByAuthor";
+}
+
+<h1>Publicaciones de @Model.Author.UserName</h1>
+
+<table class="table">
+    <thead>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Publications) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Image)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Body)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

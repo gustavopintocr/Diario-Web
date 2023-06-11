@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using Weblog.Data;
 using Weblog.Models;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {

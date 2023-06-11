@@ -1,4 +1,4 @@
-﻿@model Weblog.Models.Homepage
+﻿@model Weblog.Models.DTOs.Homepage
 
 @{
     ViewData["Title"] = "Index";
@@ -46,7 +46,10 @@
             <ul class="list-group">
                 @foreach (var author in Model.Authors)
                 {
-                    <li class="list-group-item"><a class="category-link" href="#">@author.UserName</a></li>
+                    <li class="list-group-item">
+                        @{ var authorId = author.Id; }
+                        @Html.ActionLink(author.Id, "PublicationsByAuthor", "Publications", new { authorId }, null)
+                    </li>
                 }
             </ul>
 

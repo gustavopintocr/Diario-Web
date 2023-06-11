@@ -1,4 +1,4 @@
-﻿namespace Weblog.Models
+﻿namespace Weblog.Models.DTOs
 {
     public class Homepage
     {

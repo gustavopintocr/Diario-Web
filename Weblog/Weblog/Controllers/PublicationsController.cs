@@ -11,6 +11,7 @@ using Microsoft.VisualBasic;
 using PagedList;
 using Weblog.Data;
 using Weblog.Models;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {
@@ -63,9 +64,6 @@ namespace Weblog.Controllers
             return View();
         }
 
-        // POST: Publications/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication)
@@ -185,6 +183,19 @@ namespace Weblog.Controllers
         private bool PublicationExists(int id)
         {
           return (_context.Publication?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public async Task<IActionResult> PublicationsByAuthor(string? authorId)
+        {
+            if (authorId == null || _context.Publication == null)
+            {
+                return NotFound();
+            }
+            PublicationsAuthor publicationsAuthor = new PublicationsAuthor();
+            publicationsAuthor.Publications = _context.Publication.Where(p => p.UserId == authorId).ToList();
+            publicationsAuthor.Author = _context.Users.FirstOrDefault(m => m.Id == authorId);
+
+            return View(publicationsAuthor);
         }
     }
 }
