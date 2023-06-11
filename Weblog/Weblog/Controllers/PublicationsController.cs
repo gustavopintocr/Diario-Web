@@ -197,5 +197,18 @@ namespace Weblog.Controllers
 
             return View(publicationsAuthor);
         }
+
+        public async Task<IActionResult> PublicationsByCategory(int? categoryId)
+        {
+            if (categoryId == null || _context.Publication == null)
+            {
+                return NotFound();
+            }
+            PublicationsCategory publicationsCategory = new PublicationsCategory();
+            publicationsCategory.Category = _context.Category.FirstOrDefault(m => m.Id == categoryId);
+            publicationsCategory.Publications = _context.Publication.Where(p => p.Categories.Any(c => c.Id == categoryId)).ToList();
+
+            return View(publicationsCategory);
+        }
     }
 }

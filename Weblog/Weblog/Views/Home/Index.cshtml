@@ -48,7 +48,7 @@
                 {
                     <li class="list-group-item">
                         @{ var authorId = author.Id; }
-                        @Html.ActionLink(author.Id, "PublicationsByAuthor", "Publications", new { authorId }, null)
+                        @Html.ActionLink(author.UserName, "PublicationsByAuthor", "Publications", new { authorId }, null)
                     </li>
                 }
             </ul>
@@ -57,7 +57,12 @@
             <ul class="list-group">
                 @foreach (var category in Model.Categories)
                 {
-                    <li class="list-group-item"><a class="category-link" href="#">@category.Name</a></li>
+                    <li class="list-group-item">
+                        @{
+                            var categoryId = category.Id;
+                        }
+                    @Html.ActionLink(category.Name, "PublicationsByCategory", "Publications", new { categoryId }, null)
+                    </li>
                 }
             </ul>
         </div>
