@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -61,18 +62,24 @@ namespace Weblog.Controllers
         // GET: Publications/Create
         public IActionResult Create()
         {
+            ViewBag.Categories = _context.Category.ToList();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication, int[] Categories)
         {
             publication.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             publication.Date = DateTime.Now;
+            foreach (var item in Categories) {
+                var category = await _context.Category
+                                           .FirstOrDefaultAsync(m => m.Id == item);
+                publication.Categories.Add(category);
+            }
             if (ModelState.IsValid)
             {
-                AssignUserRole(publication.UserId);
+                await AssignUserRole(publication.UserId);
                 _context.Add(publication);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -80,17 +87,20 @@ namespace Weblog.Controllers
             return View(publication);
         }
 
-        public void AssignUserRole(string userId)
+        public async Task<bool> AssignUserRole(string userId)
         {
-            var roleId = _context.Roles.FirstOrDefault(r => r.Name == "Author").Id;
-            var userRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = roleId,
-            };
+            var role = _context.Roles.FirstOrDefault(r => r.Name == "Author");
+            var userRole = await _context.UserRoles
+                            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == role.Id);
 
-            _context.UserRoles.Add(userRole);
-            _context.SaveChanges();
+            if (userRole == null)
+            {
+                // If the user is not in the role, add it
+                userRole = new IdentityUserRole<string> { UserId = userId, RoleId = role.Id };
+                _context.UserRoles.Add(userRole);
+                await _context.SaveChangesAsync();
+            }
+            return userRole != null;
         }
         // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(int? id)
