@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using PagedList;
+using Microsoft.Extensions.Options;
 using Weblog.Data;
 using Weblog.Models;
+using PagedList;
 
 namespace Weblog.Controllers
 {
@@ -174,6 +176,51 @@ namespace Weblog.Controllers
         {
           return (_context.Publication?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+
+        // Paginación Carga bajo demanda
+        public async Task<IActionResult> Index(int? page)
+        {
+            int pageSize = 5; // Cantidad de elementos por página
+            int pageNumber = (page ?? 1);
+            IActionResult result = await ObtenerDatosPorPagina(pageNumber, pageSize);
+            int totalItems = await ObtenerNumeroTotalDeDatos();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            // Crear un objeto de paginación utilizando los datos obtenidos, el número de página actual y el número total de páginas
+            IPagedList<IActionResult> pagedData = new StaticPagedList<IActionResult>(new[] { result }, pageNumber, pageSize, totalPages);
+
+            return View(pagedData);
+        }
+
+        private async Task<IActionResult> ObtenerDatosPorPagina(int pageNumber, int pageSize)
+        {
+
+            int startIndex = (pageNumber - 1) * pageSize;
+            var result = await _context.Publication
+                .OrderBy(x => x.Date)  // Ordenar por fecha
+                .Skip(startIndex)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return View(result);
+        }
+
+        private async Task<int> ObtenerNumeroTotalDeDatos()
+        {
+            int totalItems = await ContarRegistrosEnBaseDeDatos();
+
+            return totalItems;
+        }
+
+        private async Task<int> ContarRegistrosEnBaseDeDatos()
+        {
+            int totalItems = await _context.Publication.CountAsync();
+            return totalItems;
+        }
+
+
 
     }
 }

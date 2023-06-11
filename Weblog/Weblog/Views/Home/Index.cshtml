@@ -26,19 +26,16 @@
                     </div>
                 }
                 <nav aria-label="Paginación">
-                    <ul class="pagination">
+                    <ul class="pagination" id="pagination">
                         <li class="page-item disabled">
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
                         </li>
-                        <li class="page-item active" aria-current="page">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
+                        @for (var i = 1; i <= Math.Ceiling((double)ViewBag.TotalItems / ViewBag.PageSize); i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link pagination-link" href="#" data-page="@i">@i</a>
+                            </li>
+                        }
                         <li class="page-item">
                             <a class="page-link" href="#">Siguiente</a>
                         </li>
@@ -48,9 +45,13 @@
             <div class="col-lg-3 right-section">
                 <h4>Autores</h4>
                 <ul class="list-group">
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 1</a></li>
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 2</a></li>
-                    <li class="list-group-item"><a class="author-link" href="#">Autor 3</a></li>
+                    @if (ViewBag.Autores is not null)
+                    {
+                        @foreach (var autor in ViewBag.Autores)
+                        {
+                            <li class="list-group-item"><a class="author-link" href="#">@autor</a></li>
+                        }
+                    }
                 </ul>
 
                 <h4 class="mt-4">Categorías</h4>

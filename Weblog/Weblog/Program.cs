@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Weblog.Controllers;
 using Weblog.Data;
 using Weblog.Models;
 
@@ -11,6 +12,9 @@ builder.Services.AddDbContext<WeblogContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole>().AddDefaultTokenProviders()
     .AddEntityFrameworkStores<WeblogContext>()
     .AddDefaultUI();
+
+builder.Services.AddMvc().AddApplicationPart(typeof(HomeController).Assembly)
+            .AddControllersAsServices();
 
 builder.Services.AddRazorPages();
 

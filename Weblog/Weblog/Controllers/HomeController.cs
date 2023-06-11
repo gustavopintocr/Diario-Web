@@ -31,6 +31,9 @@ namespace Weblog.Controllers
             publications = _context.Publication != null ? _context.Publication.OrderBy(x => x.Date).ToList(): new List<Publication>();
             ViewBag.Publications = publications;
 
+            var totalCount = ContarRegistrosEnBaseDeDatos();
+            ViewBag.PageSize = 5;
+
             return View();
         }
 
@@ -47,20 +50,20 @@ namespace Weblog.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        //// Paginación Carga bajo demanda
-        //public async Task<IPagedList> Pages(int? page)
-        //{
-        //    int pageSize = 5; // Cantidad de elementos por página
-        //    int pageNumber = (page ?? 1);
-        //    ICollection<Publication> result = await ObtenerDatosPorPagina(pageNumber, pageSize);
-        //    int totalItems = await ObtenerNumeroTotalDeDatos();
-        //    int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+        // Paginación Carga bajo demanda
+        public async Task<IPagedList> Pages(int? page)
+        {
+            int pageSize = 5; // Cantidad de elementos por página
+            int pageNumber = (page ?? 1);
+            ICollection<Publication> result = await ObtenerDatosPorPagina(pageNumber, pageSize);
+            int totalItems = await ObtenerNumeroTotalDeDatos();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-        //    // Crear un objeto de paginación utilizando los datos obtenidos, el número de página actual y el número total de páginas
-        //    IPagedList<IActionResult> pagedData = new StaticPagedList<IActionResult>((IEnumerable<IActionResult>)(new[] { result }), pageNumber, pageSize, totalPages);
+            // Crear un objeto de paginación utilizando los datos obtenidos, el número de página actual y el número total de páginas
+            IPagedList<IActionResult> pagedData = new StaticPagedList<IActionResult>((IEnumerable<IActionResult>)(new[] { result }), pageNumber, pageSize, totalPages);
 
-        //    return pagedData;
-        //}
+            return pagedData;
+        }
 
         //public async Task<IActionResult> GetPaginatedPosts(int pageNumber, int pageSize)
         //{
@@ -68,30 +71,32 @@ namespace Weblog.Controllers
         //    return PartialView("_PaginatedPosts", paginatedPosts);
         //}
 
-        //private async Task<ICollection<Publication>> ObtenerDatosPorPagina(int pageNumber, int pageSize)
-        //{
-        //    int startIndex = (pageNumber - 1) * pageSize;
-        //    var result = await _context.Publication
-        //        .OrderBy(x => x.Date)  // Ordenar por fecha
-        //        .Skip(startIndex)
-        //        .Take(pageSize)
-        //        .ToListAsync();
+        private async Task<ICollection<Publication>> ObtenerDatosPorPagina(int pageNumber, int pageSize)
+        {
+            int startIndex = (pageNumber - 1) * pageSize;
+            var result = await _context.Publication
+                .OrderBy(x => x.Date)  // Ordenar por fecha
+                .Skip(startIndex)
+                .Take(pageSize)
+                .ToListAsync();
 
-        //    return result;
-        //}
+            return result;
+        }
 
 
-        //private async Task<int> ObtenerNumeroTotalDeDatos()
-        //{
-        //    int totalItems = await ContarRegistrosEnBaseDeDatos();
+        private async Task<int> ObtenerNumeroTotalDeDatos()
+        {
+            int totalItems = await ContarRegistrosEnBaseDeDatos();
 
-        //    return totalItems;
-        //}
+            return totalItems;
+        }
 
-        //private async Task<int> ContarRegistrosEnBaseDeDatos()
-        //{
-        //    int totalItems = await _context.Publication.CountAsync();
-        //    return totalItems;
-        //}
+        private async Task<int> ContarRegistrosEnBaseDeDatos()
+        {
+            int totalItems = await _context.Publication.CountAsync();
+            ViewBag.TotalItems = totalItems;
+            ViewBag.PageSize = 5;
+            return totalItems;
+        }
     }
 }
