@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
+using System.Data;
 using System.Diagnostics;
 using Weblog.Data;
 using Weblog.Models;
@@ -20,18 +21,16 @@ namespace Weblog.Controllers
 
         public IActionResult Index()
         {
-            // Lo meti aca porque en el metodo no me los esta jalando
-            //get categories
-            List<Category> categories;
-            categories = _context.Category != null ? _context.Category.OrderBy(c => c.Name).ToList() : new List<Category>();
-            ViewBag.Categories = categories;
-
-            // get publications
-            List<Publication> publications;
-            publications = _context.Publication != null ? _context.Publication.OrderBy(x => x.Date).ToList(): new List<Publication>();
-            ViewBag.Publications = publications;
-
-            return View();
+            Homepage homepage = new Homepage();
+            homepage.Publications = _context.Publication.OrderBy(x => x.Date).ToList();
+            homepage.Categories = _context.Category.OrderBy(c => c.Name).ToList();
+            homepage.Authors = _context.Users
+                                    .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { User = u, UserRole = ur })
+                                    .Join(_context.Roles, ur => ur.UserRole.RoleId, r => r.Id, (ur, r) => new { ur.User, Role = r })
+                                    .Where(x => x.Role.Name == "Author")
+                                    .Select(x => x.User)
+                                    .ToList();
+            return View(homepage);
         }
 
         //public void getCategories()
