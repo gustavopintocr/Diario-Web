@@ -1,4 +1,39 @@
-﻿@model List<Weblog.Models.Publication>
+﻿@model List<Weblog.Models.DTOs.PublicationWithAuthorInfo>
+
+<script>
+    $(document).ready(function () {
+        $(".showComments").click(function (e) {
+            e.preventDefault();
+
+            // Find the comments container related to the clicked publication
+            var commentsContainer = $(this).siblings(".commentsContainer");
+            console.log(commentsContainer)
+            // Toggle the visibility of comments container
+            commentsContainer.fadeToggle(function () {
+                if (commentsContainer.is(":visible")) {
+                    loadComments(commentsContainer); // Call the function to load comments dynamically
+                }
+            });
+        });
+    });
+
+    function loadComments(commentsContainer) {
+        // Use AJAX to load the comments dynamically
+        $.ajax({
+            url: '/Comments/CommentsByPublication', // Replace with your controller action to retrieve comments
+            type: 'GET',
+            data: { publicationId: commentsContainer.data('publication-id') }, // Pass the publicationId using data attribute
+            success: function (result) {
+                // Handle the response and append comments to the container
+                commentsContainer.html(result);
+            },
+            error: function () {
+                // Handle any errors that occur during AJAX request
+                alert("Failed to load comments.");
+            }
+        });
+    }
+</script>
 
 @foreach (var publication in Model)
 {
@@ -7,12 +42,15 @@
         <p class="text-muted">@publication.Date</p>
         <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
         <p class="post-summary">@publication.Body</p>
-        <p class="text-muted">
-            Autor: <a class="author-link" href="#">Nombre del autor</a>
-            | <a href="#" class="view-comments" data-publication-id="@publication.Id">Ver comentarios</a>
-
-        </p>
-        <a href="#" class="btn btn-primary">Leer más</a>
+        @if (publication.AuthorId != null){
+            var authorId = publication.AuthorId;
+            <a href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@publication.AuthorName</a>
+        } else
+        {
+            <p>Sin autor</p>
+        }
+        <a href="#" class="showComments">Show Comments</a>
+        <div class="commentsContainer" style="display: none;" data-publication-id="@publication.Id"></div>
     </div>
 }
 <nav aria-label="Paginación">

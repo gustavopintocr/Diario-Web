@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Weblog.Data;
 using Weblog.Models;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {
@@ -24,6 +25,12 @@ namespace Weblog.Controllers
         {
             var weblogContext = _context.Comment.Include(c => c.Publication);
             return View(await weblogContext.ToListAsync());
+        }
+
+        public async Task<IActionResult> CommentsByPublication(int publicationId)
+        {
+            var comments = await _context.Comment.Where(p => p.PublicationId == publicationId).ToListAsync();
+            return PartialView("_Comments", comments);
         }
 
         // GET: Comments/Details/5
