@@ -1,21 +1,29 @@
 ﻿@model List<Weblog.Models.Publication>
 
-@foreach (var publication in Model)
-{
-    <div class="post">
-        <h2 class="post-title">@publication.Title</h2>
-        <p class="text-muted">@publication.Date</p>
-        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
-        <p class="post-summary">@publication.Body</p>
-        <p class="text-muted">
-            Autor: <a class="author-link" href="#">Nombre del autor</a>
-            | <a href="#" class="view-comments" data-publication-id="@publication.Id">Ver comentarios</a>
-
-        </p>
-        <a href="#" class="btn btn-primary">Leer más</a>
+<div class="container">
+    <div class="row">
+        @foreach (var publication in Model)
+        {
+            <div class="col-lg-12">
+                <div class="card mb-4 border-rounded">
+                    <img src="" alt="Imagen de la publicación" class="card-img-top">
+                    <div class="card-body">
+                        <h2 class="card-title">@publication.Title</h2>
+                        <p class="card-text text-muted">@publication.Date</p>
+                        <p class="card-text">@publication.Body</p>
+                        <p class="card-text">
+                            Autor: <a class="author-link" href="#">Nombre del autor</a>
+                            | <a href="#" class="view-comments" data-publication-id="@publication.Id">Ver comentarios</a>
+                        </p>
+                        <a href="#" class="btn btn-primary">Leer más</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-}
-<nav aria-label="Paginación">
+</div>
+
+<nav aria-label="Paginación" class="text-center">
     <ul class="pagination" id="pagination">
         <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
             <a class="page-link" href="#" tabindex="-1" aria-disabled="@(ViewBag.CurrentPage == 1 ? "true" : "false")">Anterior</a>
