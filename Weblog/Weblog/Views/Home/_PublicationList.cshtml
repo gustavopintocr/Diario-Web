@@ -7,7 +7,7 @@
 
             // Find the comments container related to the clicked publication
             var commentsContainer = $(this).siblings(".commentsContainer");
-            console.log(commentsContainer)
+            console.log(commentsContainer); 
             // Toggle the visibility of comments container
             commentsContainer.fadeToggle(function () {
                 if (commentsContainer.is(":visible")) {
@@ -26,6 +26,7 @@
             success: function (result) {
                 // Handle the response and append comments to the container
                 commentsContainer.html(result);
+                console.log("cona")
             },
             error: function () {
                 // Handle any errors that occur during AJAX request
@@ -51,6 +52,11 @@
         }
         <a href="#" class="showComments">Show Comments</a>
         <div class="commentsContainer" style="display: none;" data-publication-id="@publication.Id"></div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Edit">Editar</a>
+            <a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Delete">Eliminar</a>
+        }
     </div>
 }
 <nav aria-label="Paginación">

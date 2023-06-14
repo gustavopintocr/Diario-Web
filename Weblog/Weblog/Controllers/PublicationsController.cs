@@ -144,7 +144,7 @@ namespace Weblog.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(publication);
         }
@@ -183,7 +183,7 @@ namespace Weblog.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
 
         private bool PublicationExists(int id)
