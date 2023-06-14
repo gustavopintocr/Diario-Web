@@ -5,59 +5,71 @@
         $(".showComments").click(function (e) {
             e.preventDefault();
 
-            // Find the comments container related to the clicked publication
-            var commentsContainer = $(this).siblings(".commentsContainer");
+           var commentsContainer = $(this).siblings(".commentsContainer");
             console.log(commentsContainer); 
-            // Toggle the visibility of comments container
             commentsContainer.fadeToggle(function () {
                 if (commentsContainer.is(":visible")) {
-                    loadComments(commentsContainer); // Call the function to load comments dynamically
+                    loadComments(commentsContainer);
                 }
             });
         });
     });
 
     function loadComments(commentsContainer) {
-        // Use AJAX to load the comments dynamically
         $.ajax({
-            url: '/Comments/CommentsByPublication', // Replace with your controller action to retrieve comments
+            url: '/Comments/CommentsByPublication',
             type: 'GET',
-            data: { publicationId: commentsContainer.data('publication-id') }, // Pass the publicationId using data attribute
+            data: { publicationId: commentsContainer.data('publication-id') },
             success: function (result) {
-                // Handle the response and append comments to the container
                 commentsContainer.html(result);
                 console.log("cona")
             },
             error: function () {
-                // Handle any errors that occur during AJAX request
                 alert("Failed to load comments.");
             }
         });
     }
 </script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 @foreach (var publication in Model)
 {
-    <div class="post">
-        <h2 class="post-title">@publication.Title</h2>
-        <p class="text-muted">@publication.Date</p>
-        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
-        <p class="post-summary">@publication.Body</p>
-        @if (publication.AuthorId != null){
-            var authorId = publication.AuthorId;
-            <a href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@publication.AuthorName</a>
-        } else
-        {
-            <p>Sin autor</p>
-        }
-        <a href="#" class="showComments">Show Comments</a>
-        <div class="commentsContainer" style="display: none;" data-publication-id="@publication.Id"></div>
-        @if (User.IsInRole("Admin"))
-        {
-            <a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Edit">Editar</a>
-            <a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Delete">Eliminar</a>
-        }
-    </div>
+    <article class="blog-post mb-4 border rounded">
+        <div class="m-4">
+            <h3>@publication.Title      <small class="text-muted">@publication.Date.ToShortDateString()</small></h3>
+            <img class="thumbnail" src="https://via.placeholder.com/850x350">
+            <p>
+                @{
+                    string publicationHeader = publication.Body.Length <= 200 ? publication.Body : publication.Body.Substring(0, 512) + "...";
+                }
+                @publicationHeader
+            </p>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <ul class="navbar-nav ml-auto">
+                        @if (publication.AuthorId != null)
+                        {
+                            var authorId = publication.AuthorId;
+                            <li class="nav-item"><a class="nav-link text-dark" href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@publication.AuthorName</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark disabled">Sin autor</a></li>
+                        }
+                        <li class="nav-item"><a href="#" class="nav-link text-dark showComments">Show Comments</a></li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Edit">Editar</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Delete">Eliminar</a></li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        
+    </article>
 }
 <nav aria-label="Paginación">
     <ul class="pagination" id="pagination">
