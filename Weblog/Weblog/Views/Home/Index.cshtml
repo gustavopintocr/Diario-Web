@@ -89,9 +89,8 @@
                 </ul>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <h4 class="mt-4">Categorías</h4>
-                    <div class="m-2">
-                        <form asp-controller="Publications" asp-action="Create">
+                    <div class="m-4">
+                        <form asp-controller="Publications" asp-action="Create" method="GET">
                             <button type="submit" class="w-100 btn btn-lg btn-primary">Crear una publicación!</button>
                         </form>
                     </div>

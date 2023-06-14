@@ -38,11 +38,12 @@
 {
     <article class="blog-post mb-4 border rounded">
         <div class="m-4">
-            <h3>@publication.Title      <small class="text-muted">@publication.Date.ToShortDateString()</small></h3>
+            <h3>@publication.Title      <small class="text-muted text-sm">@publication.Date.ToShortDateString()</small></h3>
             <img class="thumbnail" src="https://via.placeholder.com/850x350">
             <p>
-                @{
-                    string publicationHeader = publication.Body.Length <= 200 ? publication.Body : publication.Body.Substring(0, 512) + "...";
+                @{ string publicationHeader = "No body"; }
+                @if(publication.Body != null){
+                    publicationHeader = publication.Body.Length <= 200 ? publication.Body : publication.Body.Substring(0, 512) + "...";
                 }
                 @publicationHeader
             </p>
@@ -68,7 +69,6 @@
                 </div>
             </nav>
         </div>
-        
     </article>
 }
 <nav aria-label="Paginación">

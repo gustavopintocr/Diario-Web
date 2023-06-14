@@ -157,8 +157,7 @@ namespace Weblog.Controllers
                 return NotFound();
             }
 
-            var publication = await _context.Publication
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var publication = await _context.Publication.Include(p => p.User).FirstOrDefaultAsync(m => m.Id == id);
             if (publication == null)
             {
                 return NotFound();
@@ -198,7 +197,7 @@ namespace Weblog.Controllers
                 return NotFound();
             }
             PublicationsAuthor publicationsAuthor = new PublicationsAuthor();
-            publicationsAuthor.Publications = await _context.Publication.Where(p => p.UserId == authorId).ToListAsync();
+            publicationsAuthor.Publications = await _context.Publication.Include(p => p.User).Where(p => p.UserId == authorId).ToListAsync();
             publicationsAuthor.Author = await _context.Users.FirstOrDefaultAsync(m => m.Id == authorId);
 
             return View(publicationsAuthor);
@@ -212,7 +211,7 @@ namespace Weblog.Controllers
             }
             PublicationsCategory publicationsCategory = new PublicationsCategory();
             publicationsCategory.Category = await _context.Category.FirstOrDefaultAsync(m => m.Id == categoryId);
-            publicationsCategory.Publications = await _context.Publication.Where(p => p.Categories.Any(c => c.Id == categoryId)).ToListAsync();
+            publicationsCategory.Publications = await _context.Publication.Include(p => p.User).Where(p => p.Categories.Any(c => c.Id == categoryId)).ToListAsync();
 
             return View(publicationsCategory);
         }

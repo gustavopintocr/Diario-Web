@@ -6,28 +6,43 @@
 
 <h1>Publicaciones de @Model.Author.UserName</h1>
 
-<table class="table">
-    <thead>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Publications) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-        </tr>
+@foreach (var publication in Model.Publications)
+{
+    <article class="blog-post mb-4 border rounded">
+        <div class="m-4">
+            <h3>@publication.Title      <small class="text-muted text-sm">@publication.Date.ToShortDateString()</small></h3>
+            <img class="thumbnail" src="https://via.placeholder.com/850x350">
+            <p>
+                @{
+                    string publicationHeader = "No body";
+                }
+                @if (publication.Body != null)
+                {
+                    publicationHeader = publication.Body.Length <= 200 ? publication.Body : publication.Body.Substring(0, 512) + "...";
+                }
+                @publicationHeader
+            </p>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <ul class="navbar-nav ml-auto">
+                        @if (Model.Author.Id != null)
+                        {
+                            var authorId = publication.User.Id;
+                            <li class="nav-item"><a class="nav-link text-dark" href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@publication.User.Id</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark disabled">Sin autor</a></li>
+                        }
+                        <li class="nav-item"><a href="#" class="nav-link text-dark showComments">Show Comments</a></li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Edit">Editar</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@publication.Id" asp-action="Delete">Eliminar</a></li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </article>
 }
-    </tbody>
-</table>
