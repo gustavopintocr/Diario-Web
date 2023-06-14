@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Weblog.Data;
 using Weblog.Models;
+using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
 {

@@ -8,12 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using PagedList;
 using Microsoft.Extensions.Options;
 using Weblog.Data;
 using Weblog.Models;
-using PagedList;
 using Weblog.Models.DTOs;
 
 namespace Weblog.Controllers
@@ -104,7 +102,6 @@ namespace Weblog.Controllers
             }
             return userRole != null;
         }
-        // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Publication == null)
@@ -120,9 +117,6 @@ namespace Weblog.Controllers
             return View(publication);
         }
 
-        // POST: Publications/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Image,Body")] Publication publication)
@@ -204,8 +198,8 @@ namespace Weblog.Controllers
                 return NotFound();
             }
             PublicationsAuthor publicationsAuthor = new PublicationsAuthor();
-            publicationsAuthor.Publications = _context.Publication.Where(p => p.UserId == authorId).ToList();
-            publicationsAuthor.Author = _context.Users.FirstOrDefault(m => m.Id == authorId);
+            publicationsAuthor.Publications = await _context.Publication.Where(p => p.UserId == authorId).ToListAsync();
+            publicationsAuthor.Author = await _context.Users.FirstOrDefaultAsync(m => m.Id == authorId);
 
             return View(publicationsAuthor);
         }
@@ -217,8 +211,8 @@ namespace Weblog.Controllers
                 return NotFound();
             }
             PublicationsCategory publicationsCategory = new PublicationsCategory();
-            publicationsCategory.Category = _context.Category.FirstOrDefault(m => m.Id == categoryId);
-            publicationsCategory.Publications = _context.Publication.Where(p => p.Categories.Any(c => c.Id == categoryId)).ToList();
+            publicationsCategory.Category = await _context.Category.FirstOrDefaultAsync(m => m.Id == categoryId);
+            publicationsCategory.Publications = await _context.Publication.Where(p => p.Categories.Any(c => c.Id == categoryId)).ToListAsync();
 
             return View(publicationsCategory);
         }

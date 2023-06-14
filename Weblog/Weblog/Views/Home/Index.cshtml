@@ -3,89 +3,43 @@
 @{
     ViewData["Title"] = "Index";
 }
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Diario Web</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Carga la vista parcial inicialmente
-            loadPartialView(1);
+<script>
+    $(document).ready(function () {
+        // Carga la vista parcial inicialmente
+        loadPartialView(1);
 
-            // Maneja el evento de clic en los enlaces de paginación
-            $(document).on('click', '.pagination-link', function (e) {
-                e.preventDefault();
+        // Maneja el evento de clic en los enlaces de paginación
+        $(document).on('click', '.pagination-link', function (e) {
+            e.preventDefault();
 
-                var pageNumber = $(this).data('page');
+            var pageNumber = $(this).data('page');
 
-                // Carga la vista parcial de la página seleccionada
-                loadPartialView(pageNumber);
-            });
+            // Carga la vista parcial de la página seleccionada
+            loadPartialView(pageNumber);
         });
+    });
 
-        $(document).ready(function () {
-            $('.view-comments').on('click', function (e) {
-                e.preventDefault();
+    function loadPartialView(pageNumber) {
+        var pageSize = 5; // Número de elementos por página
 
-                var publicationId = $(this).data('publication-id');
+        $.ajax({
+            url: '/Home/Pages',
+            type: 'GET',
+            data: { page: pageNumber },
+            success: function (data) {
+                // Actualiza el contenido de las publicaciones con los nuevos resultados
+                $('#partialViewContainer').html(data);
 
-                // Realiza una solicitud Ajax para obtener los comentarios de la publicación
-                $.ajax({
-                    url: '/Publication/Comments',
-                    type: 'GET',
-                    data: { publicationId: publicationId },
-                    success: function (data) {
-                        // Limpia la lista de comentarios
-                        $('#comments-list').empty();
-
-                        // Agrega cada comentario a la lista
-                        $.each(data, function (index, comment) {
-                            $('#comments-list').append('<li>' + comment.Body + '</li>');
-                        });
-
-                        // Muestra el pop-up de comentarios
-                        $('#comments-popup').show();
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            });
-
-            // Cierra el pop-up al hacer clic en cualquier parte fuera de él
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('#comments-popup').length) {
-                    $('#comments-popup').hide();
-                }
-            });
+                // Actualiza los enlaces de paginación activando el enlace correspondiente
+                $('#pagination').find('.pagination-link').removeClass('active');
+                $('#pagination').find('[data-page="' + pageNumber + '"]').addClass('active');
+            },
+            error: function (error) {
+                console.log(error);
+            }
         });
-
-        function loadPartialView(pageNumber) {
-            var pageSize = 5; // Número de elementos por página
-
-            $.ajax({
-                url: '/Home/Pages',
-                type: 'GET',
-                data: { page: pageNumber },
-                success: function (data) {
-                    // Actualiza el contenido de las publicaciones con los nuevos resultados
-                    $('#partialViewContainer').html(data);
-
-                    // Actualiza los enlaces de paginación activando el enlace correspondiente
-                    $('#pagination').find('.pagination-link').removeClass('active');
-                    $('#pagination').find('[data-page="' + pageNumber + '"]').addClass('active');
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        }
-    </script>
-</head>
+    }
+</script>
 <body>
     <div class="container mt-4">
         <div class="row">
@@ -93,19 +47,18 @@
                 <div id="partialViewContainer">
                     <div id="partialViewContainer"></div>
                 </div>
-                <div id="comments-popup" class="popup-container">
-                    <div class="popup-content">
-                        <h3>Comentarios</h3>
-                        <ul id="comments-list"></ul>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-3 right-section">
                 <h4>Autores</h4>
                 <ul class="list-group">
                     @foreach (var author in Model.Authors)
                     {
-                        <li class="list-group-item"><a class="category-link" href="#">@author</a></li>
+                        <li class="list-group-item">
+                            @{
+                                var authorId = author.Id;
+                            }
+                            @Html.ActionLink(author.UserName, "PublicationsByAuthor", "Publications", new { authorId }, null)
+                        </li>
                     }
                 </ul>
 
@@ -113,7 +66,12 @@
                 <ul class="list-group">
                     @foreach (var category in Model.Categories)
                     {
-                        <li class="list-group-item"><a class="category-link" href="#">@category.Name</a></li>
+                        <li class="list-group-item">
+                            @{
+                                var categoryId = category.Id;
+                            }
+                            @Html.ActionLink(category.Name, "PublicationsByCategory", "Publications", new { categoryId }, null)
+                        </li>
                     }
                 </ul>
             </div>
@@ -122,4 +80,3 @@
     
 
 </body>
-</html>

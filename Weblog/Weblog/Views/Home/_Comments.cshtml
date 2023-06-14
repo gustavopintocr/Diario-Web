@@ -1,0 +1,44 @@
+﻿@model List<Comment>
+
+@if (Model.Count > 0)
+{
+    foreach (var comment in Model)
+    {
+        <div>
+            <p><strong>@comment.Email</strong> - @comment.Body</p>
+        </div>
+    }
+}
+else
+{
+    <p class="text-muted">There are no comments available.</p>
+}
+
+<form id="addCommentForm" data-publication-id="@ViewBag.PublicationId">
+    <input type="text" id="commentText" name="commentText" placeholder="Enter your comment" />
+    <button type="submit">Add Comment</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#addCommentForm").submit(function (e) {
+            e.preventDefault();
+
+            var publicationId = $(this).data("publication-id");
+            var commentText = $("#commentText").val();
+
+            $.ajax({
+                url: '/Comment/AddComment',
+                type: 'POST',
+                data: { publicationId: publicationId, commentText: commentText },
+                success: function (result) {
+                    $("#commentText").val("");  // Limpiar el campo de texto del comentario
+                    $(".commentsContainer").html(result);  // Actualizar los comentarios en el contenedor
+                },
+                error: function () {
+                    alert("Failed to add comment.");
+                }
+            });
+        });
+    });
+</script>

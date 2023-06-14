@@ -1,29 +1,60 @@
-﻿@model List<Weblog.Models.Publication>
+﻿@model List<Weblog.Models.DTOs.PublicationWithAuthorInfo>
 
-<div class="container">
-    <div class="row">
-        @foreach (var publication in Model)
+<script>
+    $(document).ready(function () {
+        $(".showComments").click(function (e) {
+            e.preventDefault();
+
+            // Obtén el contenedor de comentarios y el ID de la publicación
+            var commentsContainer = $(this).siblings(".commentsContainer");
+            var publicationId = $(this).data("publication-id");
+
+            // Obtén el botón "Show Comments" de la publicación correspondiente
+            var button = $(this);
+
+            // Si los comentarios ya están visibles, oculta el contenedor y cambia el texto del botón a "Show Comments"
+            if (commentsContainer.is(":visible")) {
+                commentsContainer.slideUp();
+                button.text("Show Comments");
+            } else {
+                // Si los comentarios no están visibles, realiza una solicitud AJAX para obtenerlos y muestra el contenedor
+                $.ajax({
+                    url: '/Home/CommentsByPublication',
+                    type: 'GET',
+                    data: { publicationId: publicationId },
+                    success: function (result) {
+                        commentsContainer.html(result);  // Agrega los comentarios al contenedor
+                        commentsContainer.slideDown();  // Desliza hacia abajo para mostrar los comentarios
+                        button.text("Hide Comments");  // Cambia el texto del botón a "Hide Comments"
+                    },
+                    error: function () {
+                        alert("Failed to load comments.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+@foreach (var publication in Model)
+{
+    <div class="post">
+        <h2 class="post-title">@publication.Title</h2>
+        <p class="text-muted">@publication.Date</p>
+        <img src="" alt="Imagen de la publicación" class="img-fluid mb-2">
+        <p class="post-summary">@publication.Body</p>
+        @if (publication.AuthorId != null){
+            var authorId = publication.AuthorId;
+            <a href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@publication.AuthorName</a>
+        } else
         {
-            <div class="col-lg-12">
-                <div class="card mb-4 border-rounded">
-                    <img src="" alt="Imagen de la publicación" class="card-img-top">
-                    <div class="card-body">
-                        <h2 class="card-title">@publication.Title</h2>
-                        <p class="card-text text-muted">@publication.Date</p>
-                        <p class="card-text">@publication.Body</p>
-                        <p class="card-text">
-                            Autor: <a class="author-link" href="#">Nombre del autor</a>
-                            | <a href="#" class="view-comments" data-publication-id="@publication.Id">Ver comentarios</a>
-                        </p>
-                        <a href="#" class="btn btn-primary">Leer más</a>
-                    </div>
-                </div>
-            </div>
+            <p>Sin autor</p>
         }
+        <a href="#" class="showComments" data-publication-id="@publication.Id">Show Comments</a>
+        <div class="commentsContainer" style="display: none;"></div>
     </div>
-</div>
-
-<nav aria-label="Paginación" class="text-center">
+}
+<nav aria-label="Paginación">
     <ul class="pagination" id="pagination">
         <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
             <a class="page-link" href="#" tabindex="-1" aria-disabled="@(ViewBag.CurrentPage == 1 ? "true" : "false")">Anterior</a>
