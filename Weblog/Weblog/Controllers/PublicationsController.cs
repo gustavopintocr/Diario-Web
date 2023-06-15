@@ -84,7 +84,7 @@ namespace Weblog.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(publication);
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<bool> AssignUserRole(string userId)
@@ -146,7 +146,7 @@ namespace Weblog.Controllers
                 }
                 return RedirectToAction("Index", "Home");
             }
-            return View(publication);
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Publications/Delete/5

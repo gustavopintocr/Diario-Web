@@ -14,13 +14,22 @@
             <img class="thumbnail" src="https://via.placeholder.com/850x350">
             <p>
                 @{
-                    string publicationHeader = "No body";
+                    string publicationHeader = "Está vacío aquí";
                 }
                 @if (publication.Body != null)
                 {
-                    publicationHeader = publication.Body.Length <= 200 ? publication.Body : publication.Body.Substring(0, 512) + "...";
+                    @if (publication.Body.Length >= 200)
+                    {
+                        publicationHeader = publication.Body.Substring(0, Math.Min(publication.Body.Length, 200));
+                        @publicationHeader;
+                        <a asp-action="Details" asp-controller="Publications" asp-route-id="@publication.Id">...</a>
+                    }
+                    else
+                    {
+                        publicationHeader = publication.Body;
+                        @publicationHeader;
+                    }
                 }
-                @publicationHeader
             </p>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container">
