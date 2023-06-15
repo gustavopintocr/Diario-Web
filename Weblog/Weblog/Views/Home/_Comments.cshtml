@@ -5,18 +5,18 @@
     foreach (var comment in Model)
     {
         <div>
-            <p><strong>@comment.Email</strong> - @comment.Body</p>
+            <p><strong>@comment.Email</strong> : @comment.Body</p>
         </div>
     }
 }
-else
+else 
 {
-    <p class="text-muted">There are no comments available.</p>
+    <p class="text-muted">no hay comentarios disponibles.</p>
 }
 
 <form id="addCommentForm" data-publication-id="@ViewBag.PublicationId">
-    <input type="text" id="commentText" name="commentText" placeholder="Enter your comment" />
-    <button type="submit">Add Comment</button>
+    <input type="text" id="commentText" name="commentText" placeholder="Escribe un comentario" />
+    <button type="submit">Agregar</button>
 </form>
 
 <script>
