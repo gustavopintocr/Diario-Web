@@ -49,7 +49,7 @@ namespace Weblog.Controllers
                 return NotFound();
             }
 
-            var publication = await _context.Publication
+            var publication = await _context.Publication.Include(x => x.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (publication == null)
             {
@@ -68,7 +68,7 @@ namespace Weblog.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Image,Body,UserId")] Publication publication, int[] Categories)
+        public async Task<IActionResult> Create([Bind("Id,Title,Body,UserId")] Publication publication, IFormFile? imageFile, int[] Categories )
         {
             publication.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             publication.Date = DateTime.Now;
@@ -77,14 +77,41 @@ namespace Weblog.Controllers
                                            .FirstOrDefaultAsync(m => m.Id == item);
                 publication.Categories.Add(category);
             }
+
             if (ModelState.IsValid)
             {
-                await AssignUserRole(publication.UserId);
-                _context.Add(publication);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(publication);
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    byte[] imageBytes = null;
+
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        imageFile.CopyTo(memoryStream);
+                        imageBytes = memoryStream.ToArray();
+                    }
+
+                    publication.Image = imageBytes;
+                }
+                else
+                {
+                    string defaultImagePath = Path.Combine("wwwroot", "Default.png");
+                    byte[] defaultImageBytes = null;
+
+                    using (var fileStream = new FileStream(defaultImagePath, FileMode.Open, FileAccess.Read))
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        fileStream.CopyTo(memoryStream);
+                        defaultImageBytes = memoryStream.ToArray();
+                    }
+
+                    publication.Image = defaultImageBytes;
+                }
+                    await AssignUserRole(publication.UserId);
+                    _context.Add(publication);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            return View("Home", "HomeController");
         }
 
         public async Task<bool> AssignUserRole(string userId)

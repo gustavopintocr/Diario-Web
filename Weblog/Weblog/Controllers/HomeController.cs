@@ -65,7 +65,7 @@ namespace Weblog.Controllers
 
             var result = await _context.Publication
                 .Include(c => c.User)
-                .OrderBy(x => x.Date)
+                .OrderByDescending(x => x.Date)
                 .Skip(startIndex)
                 .Take(pageSize)
                 .Select(publication => new PublicationWithAuthorInfo

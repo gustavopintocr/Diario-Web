@@ -4,44 +4,86 @@
     ViewData["Title"] = "Details";
 }
 
+<script>
+    $(document).ready(function () {
+        $(".showComments").click(function (e) {
+            e.preventDefault();
+
+            // Obtén el contenedor de comentarios y el ID de la publicación
+            var commentsContainer = $(this).siblings(".commentsContainer");
+            var publicationId = $(this).data("publication-id");
+
+            // Obtén el botón "Show Comments" de la publicación correspondiente
+            var button = $(this);
+
+            // Si los comentarios ya están visibles, oculta el contenedor y cambia el texto del botón a "Show Comments"
+            if (commentsContainer.is(":visible")) {
+                commentsContainer.slideUp();
+                button.text("Mostrar comentarios");
+            } else {
+                // Si los comentarios no están visibles, realiza una solicitud AJAX para obtenerlos y muestra el contenedor
+                $.ajax({
+                    url: '/Home/CommentsByPublication',
+                    type: 'GET',
+                    data: { publicationId: publicationId },
+                    success: function (result) {
+                        commentsContainer.html(result);  // Agrega los comentarios al contenedor
+                        commentsContainer.slideDown();  // Desliza hacia abajo para mostrar los comentarios
+                        button.text("Ocultar comentarios");  // Cambia el texto del botón a "Hide Comments"
+                    },
+                    error: function () {
+                        alert("Fallo al cargar los comentarios");
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 <h1>Details</h1>
 
 <div>
     <h4>Publication</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Body)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Body)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-    </dl>
+    <article class="blog-post mb-4 border rounded">
+        <div class="m-4">
+            <h3>@Model.Title)      <small class="text-muted text-sm">@Model.Date.ToShortDateString())</small></h3>
+            <img class="thumbnail" src="https://via.placeholder.com/850x350">
+            <p>
+
+                @Model.Body);
+
+            </p>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <ul class="navbar-nav ml-auto">
+                        @if (Model.User != null && Model.User.Id != null)
+                        {
+                            var authorId = @Model.User.Id;
+                            <li class="nav-item"><a class="nav-link text-dark" href="@Url.Action("PublicationsByAuthor", "Publications", new { authorId })">@Model.User.UserName</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark disabled">Sin autor</a></li>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@Model.Id" asp-action="Edit">Editar</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" id="" asp-controller="Publications" asp-route-id="@Model.Id" asp-action="Delete">Eliminar</a></li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+            <div class="showCommentsContainer mt-2">
+                <buttom href="#" class="showComments btn btn-sm btn-secondary btn-block" data-publication-id="@Model.Id)">Mostrar comentarios</buttom>
+                <div class="commentsContainer" style="display: none;"></div>
+            </div>
+        </div>
+    </article>
 </div>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

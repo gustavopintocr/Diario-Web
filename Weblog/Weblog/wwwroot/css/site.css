@@ -64,3 +64,9 @@ body {
 .comment-form {
     margin-top: 20px;
 }
+
+.index-image {
+    width: 850px;
+    height: 350px;
+    padding-bottom: 10px;
+}

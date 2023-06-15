@@ -44,7 +44,11 @@
     <article class="blog-post mb-4 border rounded">
         <div class="m-4">
             <h3>@publication.Title      <small class="text-muted text-sm">@publication.Date.ToShortDateString()</small></h3>
-            <img class="thumbnail" src="https://via.placeholder.com/850x350">
+            @{
+                var base64String = Convert.ToBase64String(publication.Image);
+                var imageSource = $"data:image/jpeg;base64,{base64String}";
+            }
+            <img class="index-image" src="@imageSource">
             <p>
                 @{ string publicationHeader = "No body"; }
                 @if(publication.Body != null)
