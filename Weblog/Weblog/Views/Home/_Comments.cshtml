@@ -26,11 +26,13 @@ else
 
             var publicationId = $(this).data("publication-id");
             var commentText = $("#commentText").val();
+            console.log(commentText);
+            console.log(publicationId);
 
             $.ajax({
-                url: '/Comment/AddComment',
+                url: '/Home/AddComment',
                 type: 'POST',
-                data: { publicationId: publicationId, commentText: commentText },
+                data: { publicationId: publicationId, commentBody: commentText },
                 success: function (result) {
                     $("#commentText").val("");  // Limpiar el campo de texto del comentario
                     $(".commentsContainer").html(result);  // Actualizar los comentarios en el contenedor

@@ -97,11 +97,10 @@ namespace Weblog.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddComment(int publicationId, string commentBody)
         {
             // Obtener el email del usuario actual
-            string email = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string email = User.FindFirstValue(ClaimTypes.Email);
 
             // Crear un nuevo comentario con los datos proporcionados
             var comment = new Comment
